@@ -14,6 +14,9 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using JwtAuth.Models;
 
 namespace JwtAuth
 {
@@ -44,6 +47,15 @@ namespace JwtAuth
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
                 };
             });
+
+            services.AddDbContext<ApplicationDbContext>(options =>
+                 options.UseSqlServer(
+                     Configuration.GetConnectionString("DefaultConnection")));
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+                .AddRoles<IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>();
+
+            services.AddSwaggerDocument();
             services.AddScoped<IAuthService, AuthService>();
         }
 
@@ -60,7 +72,9 @@ namespace JwtAuth
             app.UseRouting();
             app.UseAuthentication();
             app.UseAuthorization();
-            
+
+            app.UseOpenApi();
+            app.UseSwaggerUi3();
 
             app.UseEndpoints(endpoints =>
             {

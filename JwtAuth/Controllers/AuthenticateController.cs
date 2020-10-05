@@ -10,21 +10,20 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace JwtAuth.Controllers
 {
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class UsersController : ControllerBase
+    public class AuthenticateController : ControllerBase
     {
         private readonly IAuthService _authService;
-
-        public UsersController(IAuthService authService)
+        public AuthenticateController(IAuthService authService)
         {
             _authService = authService;
         }
-
-        [AllowAnonymous]
         [HttpPost]
-        public IActionResult Authenticate([FromBody] UserInfo login)
+        [AllowAnonymous]
+        public IActionResult AuthenticateUser([FromBody] UserInfo login)
         {
+
             IActionResult response = Unauthorized();
             if (login != null)
             {
